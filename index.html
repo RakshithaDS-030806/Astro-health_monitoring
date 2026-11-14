@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AHMS // Deep-Space Biomedical Telemetry</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap');
+    body {
+      font-family: 'JetBrains Mono', monospace;
+      background-color: #020617;
+      color: #f1f5f9;
+    }
+    .grid-bg {
+      background-image: linear-gradient(to right, rgba(30, 41, 59, 0.25) 1px, transparent 1px),
+                        linear-gradient(to bottom, rgba(30, 41, 59, 0.25) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #0f172a; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+  </style>
+</head>
+<body class="min-h-screen grid-bg p-4 md:p-6">
+  <div class="max-w-7xl mx-auto">
+    <!-- Top Header -->
+    <header class="flex flex-wrap justify-between items-center border-b border-slate-800 pb-4 mb-6 gap-4 bg-slate-950/80 p-4 rounded-xl border">
+      <div>
+        <div class="flex items-center gap-2.5">
+          <span class="w-3 h-3 rounded-full bg-cyan-400 animate-ping"></span>
+          <h1 class="text-lg md:text-xl font-bold tracking-widest text-cyan-400">
+            AHMS // DEEP-SPACE BIOMEDICAL TELEMETRY
+          </h1>
+        </div>
+        <p class="text-xs text-slate-400 mt-1.5">
+          CREW: <span class="text-white font-semibold">CDR. R. SHARMA</span> &nbsp;|&nbsp;
+          MISSION DAY: <span class="text-white font-semibold">142</span> &nbsp;|&nbsp;
+          EARTH DELAY: <span class="text-amber-400 font-semibold">22m 14s (AUTONOMOUS EDGE)</span>
+        </p>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2.5">
+        <button id="btn-storm" onclick="toggleScenario('storm')"
+          class="px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 border border-amber-500/60 bg-slate-900 text-amber-400 hover:bg-slate-800 transition cursor-pointer">
+          <i data-lucide="zap" class="w-3.5 h-3.5"></i>
+          <span id="storm-label">SIMULATE SOLAR STORM</span>
+        </button>
+
+        <button id="btn-hypoxia" onclick="toggleScenario('hypoxia')"
+          class="px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 border border-rose-500/60 bg-slate-900 text-rose-400 hover:bg-slate-800 transition cursor-pointer">
+          <i data-lucide="wind" class="w-3.5 h-3.5"></i>
+          <span id="hypoxia-label">SIMULATE CO2 / HYPOXIA</span>
+        </button>
+
+        <span class="px-3 py-1.5 rounded-lg bg-emerald-950/80 border border-emerald-600 text-emerald-400 text-xs font-semibold flex items-center gap-1.5">
+          <i data-lucide="radio" class="w-3.5 h-3.5 animate-pulse"></i> EDGE AI ONLINE
+        </span>
+      </div>
+    </header>
+
+    <!-- Dynamic Emergency Alert Container -->
+    <div id="alert-container" class="mb-6 space-y-2 hidden"></div>
+
+    <!-- Primary Vital Signs Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-4 shadow-lg">
+        <div class="flex justify-between items-center text-xs text-slate-400">
+          <span>HEART RATE</span>
+          <i data-lucide="heart-pulse" class="w-4 h-4 text-rose-400"></i>
+        </div>
+        <div id="val-hr" class="text-2xl md:text-3xl font-bold mt-2 text-rose-400">72.0 BPM</div>
+        <div id="sub-hr" class="text-[11px] text-slate-500 mt-1">Baseline: 68–76 BPM (Z-Score: 0.12)</div>
+      </div>
+
+      <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-4 shadow-lg">
+        <div class="flex justify-between items-center text-xs text-slate-400">
+          <span>BLOOD OXYGEN (SpO2)</span>
+          <i data-lucide="wind" class="w-4 h-4 text-cyan-400"></i>
+        </div>
+        <div id="val-spo2" class="text-2xl md:text-3xl font-bold mt-2 text-cyan-400">98.5%</div>
+        <div id="sub-spo2" class="text-[11px] text-slate-500 mt-1">Cabin CO2: 420 ppm (Nominal)</div>
+      </div>
+
+      <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-4 shadow-lg">
+        <div class="flex justify-between items-center text-xs text-slate-400">
+          <span>RADIATION DOSIMETER</span>
+          <i data-lucide="shield-alert" class="w-4 h-4 text-purple-400"></i>
+        </div>
+        <div id="val-rad" class="text-2xl md:text-3xl font-bold mt-2 text-purple-400">0.35 mSv/h</div>
+        <div id="sub-rad" class="text-[11px] text-slate-500 mt-1">Cumulative Mission: 64.2 mSv</div>
+      </div>
+
+      <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-4 shadow-lg">
+        <div class="flex justify-between items-center text-xs text-slate-400">
+          <span>AUTONOMIC & FLUID SHIFT</span>
+          <i data-lucide="brain" class="w-4 h-4 text-amber-400"></i>
+        </div>
+        <div id="val-stress" class="text-2xl md:text-3xl font-bold mt-2 text-amber-400">24.0 IDX</div>
+        <div id="sub-stress" class="text-[11px] text-slate-500 mt-1">Cephalad Shift: 1.12x | Core: 36.8°C</div>
+      </div>
+    </div>
+
+    <!-- Main Split: Live ECG + 5 Spaceflight Hazards & Offline AI Surgeon -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Left 2 Columns -->
+      <div class="lg:col-span-2 space-y-6">
+        <!-- Live HTML5 Canvas ECG Waveform -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-4 shadow-lg">
+          <div class="flex flex-wrap justify-between items-center mb-3 gap-2">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+              <span class="text-xs text-slate-300 font-semibold tracking-wider">LIVE SINGLE-LEAD ECG STREAM (250 Hz)</span>
+            </div>
+            <span id="ecg-status" class="text-xs text-cyan-400">SINUS RHYTHM // NOMINAL</span>
+          </div>
+          <div class="relative w-full h-56 bg-slate-950 rounded-lg border border-slate-800/80 overflow-hidden">
+            <canvas id="ecgCanvas" class="w-full h-full block"></canvas>
+          </div>
+        </div>
+
+        <!-- 5 Spaceflight Hazards Live Status -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-4 shadow-lg">
+          <h2 class="text-xs text-slate-400 font-semibold tracking-wider mb-3">
+            5 SPACEFLIGHT HAZARDS // AUTONOMOUS COUNTERMEASURE MATRIX
+          </h2>
+          <div class="grid grid-cols-2 sm:grid-cols-5 gap-2.5 text-xs">
+            <div id="hz-rad" class="p-3 rounded-lg border bg-slate-950 border-slate-800 text-emerald-400 text-center">
+              <div class="text-[10px] text-slate-400">1. RADIATION</div>
+              <div class="font-bold mt-1 status-text">NOMINAL</div>
+            </div>
+            <div id="hz-iso" class="p-3 rounded-lg border bg-slate-950 border-slate-800 text-emerald-400 text-center">
+              <div class="text-[10px] text-slate-400">2. ISOLATION</div>
+              <div class="font-bold mt-1 status-text">NOMINAL</div>
+            </div>
+            <div id="hz-dist" class="p-3 rounded-lg border bg-slate-950 border-cyan-900/70 text-cyan-400 text-center">
+              <div class="text-[10px] text-slate-400">3. EARTH DELAY</div>
+              <div class="font-bold mt-1 status-text">EDGE AI</div>
+            </div>
+            <div id="hz-grav" class="p-3 rounded-lg border bg-slate-950 border-slate-800 text-emerald-400 text-center">
+              <div class="text-[10px] text-slate-400">4. GRAVITY SHIFT</div>
+              <div class="font-bold mt-1 status-text">NOMINAL</div>
+            </div>
+            <div id="hz-env" class="p-3 rounded-lg border bg-slate-950 border-slate-800 text-emerald-400 text-center">
+              <div class="text-[10px] text-slate-400">5. CLOSED CABIN</div>
+              <div class="font-bold mt-1 status-text">NOMINAL</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Offline Flight Surgeon AI Assistant -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-4 flex flex-col h-[460px] shadow-lg">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-3">
+          <div class="flex items-center gap-2">
+            <i data-lucide="cpu" class="w-5 h-5 text-cyan-400"></i>
+            <div>
+              <h2 class="text-sm font-bold text-slate-100">OFFLINE FLIGHT SURGEON</h2>
+              <p class="text-[11px] text-slate-400">Onboard Clinical Decision Support</p>
+            </div>
+          </div>
+          <span class="text-[10px] px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800">LOCAL LLM</span>
+        </div>
+
+        <div id="chat-box" class="flex-1 overflow-y-auto space-y-3 pr-1 text-xs">
+          <div class="p-3 rounded-lg bg-slate-800/80 border border-slate-700 mr-4">
+            <span class="font-bold text-[10px] block mb-1 text-cyan-400">FLIGHT SURGEON AI</span>
+            Autonomous medical node active. Use simulation toggles above or ask for protocols below.
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-1.5 mt-2 mb-2">
+          <button onclick="quickAsk('Radiation surge protocol')" class="text-[10px] px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 cursor-pointer">Radiation Protocol</button>
+          <button onclick="quickAsk('High CO2 and hypoxia check')" class="text-[10px] px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 cursor-pointer">CO2 / Hypoxia</button>
+          <button onclick="quickAsk('Fluid shift countermeasures')" class="text-[10px] px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 cursor-pointer">Fluid Shift</button>
+        </div>
+
+        <form onsubmit="handleChatSubmit(event)" class="flex gap-2">
+          <input id="chat-input" type="text" placeholder="Query onboard medical protocol..."
+            class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500" />
+          <button type="submit" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-3 py-2 rounded-lg cursor-pointer transition">
+            <i data-lucide="send" class="w-4 h-4"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    lucide.createIcons();
+
+    let activeScenario = null;
+    let telemetry = { hr: 72.0, spo2: 98.5, temp: 36.8, rad_msv: 0.35, cabin_co2: 420, stress_index: 24.0, fluid_shift_idx: 1.12 };
+
+    function toggleScenario(type) {
+      activeScenario = (activeScenario === type) ? null : type;
+      document.getElementById('btn-storm').className = activeScenario === 'storm' ? 'px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 border border-red-400 bg-red-600 text-white animate-pulse cursor-pointer' : 'px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 border border-amber-500/60 bg-slate-900 text-amber-400 hover:bg-slate-800 transition cursor-pointer';
+      document.getElementById('storm-label').textContent = activeScenario === 'storm' ? 'STOP SOLAR STORM' : 'SIMULATE SOLAR STORM';
+
+      document.getElementById('btn-hypoxia').className = activeScenario === 'hypoxia' ? 'px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 border border-red-400 bg-red-600 text-white animate-pulse cursor-pointer' : 'px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 border border-rose-500/60 bg-slate-900 text-rose-400 hover:bg-slate-800 transition cursor-pointer';
+      document.getElementById('hypoxia-label').textContent = activeScenario === 'hypoxia' ? 'STOP CO2 / HYPOXIA' : 'SIMULATE CO2 / HYPOXIA';
+      updateDashboard();
+    }
+
+    function setHazardBadge(id, isAlert, label) {
+      const el = document.getElementById(id);
+      el.className = isAlert ? 'p-3 rounded-lg border bg-red-950/70 border-red-500 text-red-300 text-center animate-pulse' : 'p-3 rounded-lg border bg-slate-950 border-slate-800 text-emerald-400 text-center';
+      el.querySelector('.status-text').textContent = label;
+    }
+
+    function updateDashboard() {
+      const now = Date.now() / 1000;
+      if (activeScenario === 'storm') {
+        telemetry.hr = +(118 + Math.sin(now * 3) * 4).toFixed(1);
+        telemetry.spo2 = +(96.2 + Math.random() * 0.4).toFixed(1);
+        telemetry.rad_msv = +(4.45 + Math.random() * 0.35).toFixed(2);
+        telemetry.cabin_co2 = 460;
+        telemetry.stress_index = 82.5;
+        telemetry.fluid_shift_idx = 1.28;
+      } else if (activeScenario === 'hypoxia') {
+        telemetry.hr = +(126 + Math.sin(now * 4) * 5).toFixed(1);
+        telemetry.spo2 = +(89.4 + Math.random() * 0.6).toFixed(1);
+        telemetry.rad_msv = 0.36;
+        telemetry.cabin_co2 = 1480;
+        telemetry.stress_index = 88.0;
+        telemetry.fluid_shift_idx = 1.15;
+      } else {
+        telemetry.hr = +(72 + Math.sin(now) * 2.5).toFixed(1);
+        telemetry.spo2 = +(98.5 + (Math.random() * 0.3 - 0.15)).toFixed(1);
+        telemetry.rad_msv = +(0.34 + Math.random() * 0.05).toFixed(2);
+        telemetry.cabin_co2 = 420;
+        telemetry.stress_index = +(24 + Math.sin(now * 0.5) * 2).toFixed(1);
+        telemetry.fluid_shift_idx = 1.12;
+      }
+
+      document.getElementById('val-hr').textContent = `${telemetry.hr} BPM`;
+      document.getElementById('val-spo2').textContent = `${telemetry.spo2}%`;
+      document.getElementById('val-rad').textContent = `${telemetry.rad_msv} mSv/h`;
+      document.getElementById('val-stress').textContent = `${telemetry.stress_index} IDX`;
+
+      setHazardBadge('hz-rad', telemetry.rad_msv > 2.5, telemetry.rad_msv > 2.5 ? 'ALERT' : 'NOMINAL');
+      setHazardBadge('hz-iso', telemetry.stress_index > 70, telemetry.stress_index > 70 ? 'HIGH STRESS' : 'NOMINAL');
+      setHazardBadge('hz-grav', telemetry.fluid_shift_idx > 1.25, telemetry.fluid_shift_idx > 1.25 ? 'LBNP REQ' : 'NOMINAL');
+      setHazardBadge('hz-env', telemetry.cabin_co2 > 1000 || telemetry.spo2 < 93, (telemetry.cabin_co2 > 1000 || telemetry.spo2 < 93) ? 'CRITICAL' : 'NOMINAL');
+
+      const alertBox = document.getElementById('alert-container');
+      if (activeScenario === 'storm') {
+        alertBox.classList.remove('hidden');
+        alertBox.innerHTML = `<div class="p-4 rounded-lg bg-red-950/90 border border-red-500 text-red-100 flex items-center gap-3 animate-pulse"><span>⚠️</span><div><span class="font-bold text-xs tracking-wider uppercase text-red-300">[CRITICAL HAZARD: SPACE RADIATION SURGE]</span><p class="text-sm">Dosimeter reading ${telemetry.rad_msv} mSv/h. Relocate immediately to storm shelter.</p></div></div>`;
+      } else if (activeScenario === 'hypoxia') {
+        alertBox.classList.remove('hidden');
+        alertBox.innerHTML = `<div class="p-4 rounded-lg bg-red-950/90 border border-red-500 text-red-100 flex items-center gap-3 animate-pulse"><span>⚠️</span><div><span class="font-bold text-xs tracking-wider uppercase text-red-300">[CRITICAL HAZARD: CLOSED ENVIRONMENT / HYPOXIA]</span><p class="text-sm">SpO2 dropped to ${telemetry.spo2}% and Cabin CO2 hit ${telemetry.cabin_co2} ppm.</p></div></div>`;
+      } else {
+        alertBox.classList.add('hidden');
+        alertBox.innerHTML = '';
+      }
+    }
+    setInterval(updateDashboard, 500);
+
+    const canvas = document.getElementById('ecgCanvas');
+    const ctx = canvas.getContext('2d');
+    let ecgPoints = [];
+    let phase = 0;
+    function resizeCanvas() { canvas.width = canvas.parentElement.clientWidth; canvas.height = canvas.parentElement.clientHeight; }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function getEcgSample(p) {
+      if (p > 0.12 && p < 0.20) return -0.15 * Math.sin(((p - 0.12) / 0.08) * Math.PI);
+      if (p >= 0.28 && p < 0.31) return 0.18;
+      if (p >= 0.31 && p < 0.35) return -0.85;
+      if (p >= 0.35 && p < 0.39) return 0.32;
+      if (p >= 0.52 && p < 0.68) return -0.24 * Math.sin(((p - 0.52) / 0.16) * Math.PI);
+      return (Math.random() - 0.5) * 0.03;
+    }
+
+    function animateEcg() {
+      const speed = activeScenario ? 0.026 : 0.015;
+      phase = (phase + speed) % 1;
+      ecgPoints.push(getEcgSample(phase));
+      if (ecgPoints.length > Math.floor(canvas.width / 3)) ecgPoints.shift();
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.strokeStyle = 'rgba(30, 41, 59, 0.5)';
+      for (let x = 0; x < canvas.width; x += 25) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke(); }
+      for (let y = 0; y < canvas.height; y += 25) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke(); }
+      ctx.strokeStyle = activeScenario ? '#f87171' : '#22d3ee';
+      ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      for (let i = 0; i < ecgPoints.length; i++) {
+        const x = i * 3;
+        const y = canvas.height / 2 + ecgPoints[i] * (canvas.height * 0.42);
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      requestAnimationFrame(animateEcg);
+    }
+    animateEcg();
+
+    function appendMessage(sender, text) {
+      const chatBox = document.getElementById('chat-box');
+      const div = document.createElement('div');
+      div.className = sender === 'CREW' ? 'p-3 rounded-lg bg-cyan-950/60 border border-cyan-800 ml-6 whitespace-pre-line' : 'p-3 rounded-lg bg-slate-800/80 border border-slate-700 mr-4 whitespace-pre-line';
+      div.innerHTML = `<span class="font-bold text-[10px] block mb-1 ${sender === 'CREW' ? 'text-cyan-300' : 'text-emerald-400'}">${sender === 'CREW' ? 'CDR. SHARMA' : 'FLIGHT SURGEON AI'}</span>${text}`;
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function generateProtocolResponse(query) {
+      const q = query.toLowerCase();
+      if (q.includes('rad') || q.includes('storm')) return "⚠️ SOLAR RADIATION PROTOCOL:\n1. Relocate to storm shelter.\n2. Administer radioprotectant pack.";
+      if (q.includes('co2') || q.includes('hypoxia')) return "🫁 HYPOXIA PROTOCOL:\n1. Don emergency O2 mask.\n2. Check LiOH scrubbers.";
+      return `📊 LIVE TELEMETRY STATUS:\n• Heart Rate: ${telemetry.hr} BPM | SpO2: ${telemetry.spo2}%\n• Radiation: ${telemetry.rad_msv} mSv/h`;
+    }
+
+    function quickAsk(text) {
+      appendMessage('CREW', text);
+      setTimeout(() => appendMessage('AI', generateProtocolResponse(text)), 250);
+    }
+
+    function handleChatSubmit(e) {
+      e.preventDefault();
+      const input = document.getElementById('chat-input');
+      if (!input.value.trim()) return;
+      const val = input.value; input.value = '';
+      appendMessage('CREW', val);
+      setTimeout(() => appendMessage('AI', generateProtocolResponse(val)), 250);
+    }
+  </script>
+</body>
+</html>
