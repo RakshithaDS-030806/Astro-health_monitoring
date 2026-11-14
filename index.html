@@ -1,410 +1,173 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Astronaut Health Monitoring // 5 Spaceflight Hazards</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ARES-IV // ASTRONAUT SELF-HEALTH MONITOR</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
+    :root {
+      --bg-dark: #07090f;
+      --card-bg: #0d121f;
+      --border-color: #1e293b;
+      --accent-cyan: #00f2ff;
+      --accent-blue: #38bdf8;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --optimal-green: #3fb950;
+      --warning-amber: #fca311;
+      --critical-red: #ff3c4a;
     }
 
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background-color: #ffffff;
-      color: #1a1a1a;
-      line-height: 1.5;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Inter', sans-serif;
+      padding: 16px;
+      font-size: 13px;
     }
 
-    /* Clean Top Header */
-    header {
-      background-color: #ffffff;
-      border-bottom: 1px solid #e5e7eb;
-      padding: 20px 24px;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
+    .container { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
 
-    .header-inner {
-      max-width: 820px;
-      margin: 0 auto;
+    /* Top Bar */
+    .top-bar {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 12px 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 10px;
     }
+    .mission-title { font-family: 'Share Tech Mono', monospace; font-size: 1.1rem; color: var(--accent-cyan); letter-spacing: 1px; }
+    .mission-stats { display: flex; gap: 15px; color: var(--text-muted); font-size: 0.85rem; flex-wrap: wrap; }
+    .readiness-badge { background: rgba(63, 185, 80, 0.15); color: var(--optimal-green); border: 1px solid var(--optimal-green); padding: 3px 8px; border-radius: 4px; font-weight: 700; font-size: 0.8rem; }
 
-    .brand-title {
-      font-size: 1.25rem;
-      font-weight: 800;
-      color: #111827;
-      letter-spacing: -0.02em;
-    }
-
-    .brand-sub {
-      font-size: 0.85rem;
-      color: #6b7280;
-    }
-
-    .crew-pill {
-      background-color: #fef2f2;
-      color: #dc2626;
-      border: 1px solid #fecaca;
-      padding: 6px 14px;
-      border-radius: 999px;
-      font-size: 0.8rem;
-      font-weight: 600;
-    }
-
-    /* Main Container matching your reference screenshot */
-    main {
-      max-width: 820px;
-      margin: 0 auto;
-      padding: 12px 20px 60px;
-    }
-
-    .hazard-row {
-      display: flex;
-      align-items: center;
-      gap: 22px;
-      padding: 28px 8px;
-      border-bottom: 1px solid #e5e7eb;
-      cursor: pointer;
-      transition: background-color 0.15s ease;
-    }
-
-    .hazard-row:hover {
-      background-color: #f9fafb;
-    }
-
-    .hazard-thumb {
-      width: 84px;
-      height: 84px;
-      border-radius: 50%;
-      object-fit: cover;
-      flex-shrink: 0;
-      background-color: #111827;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-    }
-
-    .hazard-content {
-      flex: 1;
-    }
-
-    .hazard-title {
-      font-size: 1.55rem;
-      font-weight: 800;
-      color: #1f2937;
-      line-height: 1.2;
+    /* Section Headers */
+    .section-header {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.9rem;
+      color: var(--accent-blue);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
       margin-bottom: 8px;
-      letter-spacing: -0.02em;
-    }
-
-    .hazard-desc {
-      font-size: 0.98rem;
-      color: #374151;
-      line-height: 1.55;
-    }
-
-    /* Red Circular Arrow Button from your screenshot */
-    .arrow-btn {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background-color: #ef4444;
-      color: #ffffff;
-      border: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      cursor: pointer;
-      transition: transform 0.15s ease, background-color 0.15s ease;
-    }
-
-    .hazard-row:hover .arrow-btn {
-      background-color: #dc2626;
-      transform: translateX(3px);
-    }
-
-    .arrow-btn svg {
-      width: 20px;
-      height: 20px;
-      stroke: #ffffff;
-      stroke-width: 2.5;
-      fill: none;
-    }
-
-    /* Health Monitoring Detail Modal when clicking a hazard */
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(17, 24, 39, 0.55);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      z-index: 50;
-    }
-
-    .modal-backdrop.open {
-      display: flex;
-    }
-
-    .modal-card {
-      background: #ffffff;
-      border-radius: 16px;
-      max-width: 560px;
-      width: 100%;
-      padding: 28px;
-      box-shadow: 0 20px 35px rgba(0, 0, 0, 0.2);
-    }
-
-    .modal-header {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
-      gap: 16px;
-      margin-bottom: 16px;
+      align-items: center;
     }
 
-    .modal-title {
-      font-size: 1.45rem;
-      font-weight: 800;
-      color: #111827;
+    /* 5 Hazards Grid */
+    .hazards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
     }
-
-    .close-btn {
-      background: #f3f4f6;
-      border: none;
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      font-size: 1.2rem;
+    .hazard-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 14px;
       cursor: pointer;
-      color: #374151;
+      transition: border-color 0.2s;
     }
+    .hazard-card:hover { border-color: var(--accent-cyan); }
+    .hazard-card.active { border-color: var(--warning-amber); background: rgba(252, 163, 17, 0.03); }
+    .hazard-card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .hazard-name { font-weight: 700; font-size: 0.95rem; }
+    .badge-status { font-size: 0.7rem; padding: 2px 6px; border-radius: 3px; font-weight: 600; }
+    .badge-optimal { background: rgba(63, 185, 80, 0.1); color: var(--optimal-green); }
+    .hazard-snippet { font-size: 0.78rem; color: var(--text-muted); line-height: 1.4; }
 
-    .telemetry-box {
-      background: #f9fafb;
-      border: 1px solid #e5e7eb;
-      border-radius: 12px;
+    /* Core Metrics Grid */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 12px;
+    }
+    .metric-box {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .metric-top { display: flex; justify-content: space-between; align-items: center; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; }
+    .metric-value-row { display: flex; align-items: baseline; gap: 6px; margin-top: 8px; }
+    .metric-val { font-family: 'Share Tech Mono', monospace; font-size: 1.8rem; color: var(--accent-cyan); font-weight: bold; }
+    .metric-unit { font-size: 0.85rem; color: var(--text-muted); }
+
+    /* Interactive Map & Action Modules */
+    .panel-box {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
       padding: 16px;
-      margin: 16px 0;
+    }
+    .anatomy-visual {
+      text-align: center;
+      padding: 20px;
+      background: #04060a;
+      border-radius: 6px;
+      border: 1px dashed var(--border-color);
+      margin-top: 10px;
+      color: var(--text-muted);
+      font-family: 'Share Tech Mono', monospace;
     }
 
-    .telemetry-label {
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      color: #6b7280;
-      letter-spacing: 0.04em;
-      margin-bottom: 6px;
+    /* Actionable Quests */
+    .quest-item {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border-color);
+      padding: 10px 14px;
+      border-radius: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
+      font-size: 0.85rem;
     }
-
-    .telemetry-reading {
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: #dc2626;
-    }
-
-    .protocol-list {
-      margin-top: 12px;
-      padding-left: 18px;
-      color: #374151;
-      font-size: 0.94rem;
-    }
-
-    .protocol-list li {
-      margin-bottom: 8px;
-    }
-
-    @media (max-width: 600px) {
-      .hazard-row {
-        gap: 14px;
-        padding: 22px 4px;
-      }
-      .hazard-thumb {
-        width: 64px;
-        height: 64px;
-      }
-      .hazard-title {
-        font-size: 1.3rem;
-      }
-      .hazard-desc {
-        font-size: 0.9rem;
-      }
-    }
+    .xp-badge { background: rgba(56, 189, 248, 0.1); color: var(--accent-blue); padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-family: 'Share Tech Mono', monospace; }
   </style>
 </head>
 <body>
 
-  <header>
-    <div class="header-inner">
-      <div>
-        <div class="brand-title">Astronaut Health Monitoring System</div>
-        <div class="brand-sub">Human Research Program • 5 Spaceflight Hazards</div>
+  <div class="container">
+    <!-- Top Bar -->
+    <div class="top-bar">
+      <div class="mission-title">ARES-IV | ASTRONAUT SELF-HEALTH MONITOR</div>
+      <div class="mission-stats">
+        <span>🛰️ EARTH DELAY: 14.4 MIN</span>
+        <span>🔥 180 STREAK</span>
+        <span>⭐ 1420 XP</span>
       </div>
-      <div class="crew-pill">Crew Status: Active Telemetry</div>
-    </div>
-  </header>
-
-  <main id="hazard-list">
-    <!-- Hazard 1: Space Radiation -->
-    <div class="hazard-row" onclick="openHazard(0)">
-      <img class="hazard-thumb" src="https://images-assets.nasa.gov/image/GSFC_20171208_Archive_e001435/GSFC_20171208_Archive_e001435~small.jpg" alt="Space Radiation">
-      <div class="hazard-content">
-        <h2 class="hazard-title">Space Radiation</h2>
-        <p class="hazard-desc">Invisible to the human eye, space radiation is not only stealthy but considered one of the most hazardous aspects of spaceflight.</p>
-      </div>
-      <button class="arrow-btn" aria-label="View Space Radiation Telemetry">
-        <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
+      <div class="readiness-badge">READINESS 100%</div>
     </div>
 
-    <!-- Hazard 2: Isolation and Confinement -->
-    <div class="hazard-row" onclick="openHazard(1)">
-      <img class="hazard-thumb" src="https://images-assets.nasa.gov/image/iss064e027012/iss064e027012~small.jpg" alt="Isolation and Confinement">
-      <div class="hazard-content">
-        <h2 class="hazard-title">Isolation and Confinement</h2>
-        <p class="hazard-desc">Behavioral responses occur among groups of people far from Earth who are isolated and confined in a small space over a long period of time.</p>
-      </div>
-      <button class="arrow-btn" aria-label="View Isolation and Confinement Telemetry">
-        <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
-    </div>
-
-    <!-- Hazard 3: Distance from Earth -->
-    <div class="hazard-row" onclick="openHazard(2)">
-      <img class="hazard-thumb" src="https://images-assets.nasa.gov/image/iss038e042122/iss038e042122~small.jpg" alt="Distance from Earth">
-      <div class="hazard-content">
-        <h2 class="hazard-title">Distance from Earth</h2>
-        <p class="hazard-desc">Instructions, new supplies, medical care, and more become increasingly challenging to receive from Earth as astronauts venture deeper into space.</p>
-      </div>
-      <button class="arrow-btn" aria-label="View Distance from Earth Telemetry">
-        <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
-    </div>
-
-    <!-- Hazard 4: Gravity Fields -->
-    <div class="hazard-row" onclick="openHazard(3)">
-      <img class="hazard-thumb" src="https://images-assets.nasa.gov/image/iss056e162781/iss056e162781~small.jpg" alt="Gravity Fields">
-      <div class="hazard-content">
-        <h2 class="hazard-title">Gravity Fields</h2>
-        <p class="hazard-desc">Astronauts' entire bodies - muscles, bones, inner ear, and organs - must adjust to the new gravities encountered on the space station or their spacecraft, as well as on the Moon, Mars, and Earth once they return home.</p>
-      </div>
-      <button class="arrow-btn" aria-label="View Gravity Fields Telemetry">
-        <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
-    </div>
-
-    <!-- Hazard 5: Hostile/Closed Environments -->
-    <div class="hazard-row" onclick="openHazard(4)">
-      <img class="hazard-thumb" src="https://images-assets.nasa.gov/image/iss065e158972/iss065e158972~small.jpg" alt="Hostile/Closed Environments">
-      <div class="hazard-content">
-        <h2 class="hazard-title">Hostile/Closed Environments</h2>
-        <p class="hazard-desc">Maintaining a safe ecosystem inside a spacecraft is essential; this means air quality, temperature, and microbial balance must be continuously monitored for crew safety.</p>
-      </div>
-      <button class="arrow-btn" aria-label="View Hostile/Closed Environments Telemetry">
-        <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
-    </div>
-  </main>
-
-  <!-- Interactive Health Telemetry Modal -->
-  <div class="modal-backdrop" id="modal" onclick="closeModal(event)">
-    <div class="modal-card" onclick="event.stopPropagation()">
-      <div class="modal-header">
-        <h3 class="modal-title" id="m-title">Hazard Title</h3>
-        <button class="close-btn" onclick="closeModal()">&times;</button>
-      </div>
-      <p id="m-desc" style="color:#4b5563; font-size:0.95rem;"></p>
-      <div class="telemetry-box">
-        <div class="telemetry-label">Live Astronaut Health Biometrics</div>
-        <div class="telemetry-reading" id="m-reading">--</div>
-      </div>
-      <div class="telemetry-label">Active Medical Countermeasures</div>
-      <ul class="protocol-list" id="m-protocols"></ul>
-    </div>
-  </div>
-
-  <script>
-    const hazards = [
-      {
-        title: "Space Radiation",
-        desc: "Galactic cosmic rays and solar particle events increase risks of radiation sickness, central nervous system damage, and long-term degenerative diseases.",
-        reading: "Cumulative Dose: 142 mSv | Dosimeter Alert: ELEVATED",
-        protocols: [
-          "Continuous personal active dosimeter tracking for every crew member.",
-          "Automated storm-shelter relocation alert when solar flare flux spikes.",
-          "Antioxidant-rich nutrition and blood biomarker screening."
-        ]
-      },
-      {
-        title: "Isolation and Confinement",
-        desc: "Extended missions in small habitats disrupt circadian rhythms, sleep architecture, mood, and team cohesion.",
-        reading: "Avg Sleep Efficiency: 78% | Cortisol Stress Index: MODERATE",
-        protocols: [
-          "Dynamic blue-enriched LED lighting schedules to anchor circadian rhythms.",
-          "Daily cognitive reaction-time & mood self-assessment check-ins.",
-          "Private psychological support & VR Earth-nature immersion sessions."
-        ]
-      },
-      {
-        title: "Distance from Earth",
-        desc: "Communication delays up to 20+ minutes each way mean crews must diagnose and treat medical emergencies autonomously without real-time Earth support.",
-        reading: "One-Way Signal Delay: 14 min 20 sec | Autonomous Med-Kit: READY",
-        protocols: [
-          "Onboard AI clinical decision-support system for autonomous diagnosis.",
-          "Portable ultrasound & blood analyzer synced directly to crew tablets.",
-          "3D-printable medical tools and shelf-stable pharmaceutical inventory."
-        ]
-      },
-      {
-        title: "Gravity Fields",
-        desc: "Microgravity and planetary gravity transitions cause bone density loss, muscle atrophy, fluid shifts to the head (SANS), and balance issues.",
-        reading: "Bone Mineral Density: -1.1%/mo | Ocular Pressure: STABLE",
-        protocols: [
-          "2.5 hours daily resistance (ARED) and cardiovascular treadmill exercise.",
-          "Lower-body negative pressure (LBNP) suits to counter headward fluid shifts.",
-          "Retinal optical coherence tomography (OCT) scans every 14 days."
-        ]
-      },
-      {
-        title: "Hostile/Closed Environments",
-        desc: "Sealed spacecraft recycle air and water continuously, where CO2 buildup or altered immune responses can threaten crew health.",
-        reading: "Cabin O2: 21.0% | CO2: 2.1 mmHg | Microbial Count: NOMINAL",
-        protocols: [
-          "Real-time cabin CO2, O2, humidity, and volatile organic compound sensors.",
-          "Routine swabbing of spacecraft surfaces and potable water loops.",
-          "Crew immune-system profiling and latent viral reactivation monitoring."
-        ]
-      }
-    ];
-
-    function openHazard(index) {
-      const h = hazards[index];
-      document.getElementById("m-title").textContent = h.title;
-      document.getElementById("m-desc").textContent = h.desc;
-      document.getElementById("m-reading").textContent = h.reading;
-      const list = document.getElementById("m-protocols");
-      list.innerHTML = "";
-      h.protocols.forEach(item => {
-        const li = document.createElement("li");
-        li.textContent = item;
-        list.appendChild(li);
-      });
-      document.getElementById("modal").classList.add("open");
-    }
-
-    function closeModal() {
-      document.getElementById("modal").classList.remove("open");
-    }
-  </script>
-</body>
-</html>
+    <!-- 5 Hazards Matrix -->
+    <div>
+      <div class="section-header"><span>NASA FIVE HAZARDS OF HUMAN SPACEFLIGHT (REGR) — INTERACTIVE MATRIX</span></div>
+      <div class="hazards-grid">
+        <div class="hazard-card active">
+          <div class="hazard-card-top"><span class="hazard-name">R // Space Radiation</span><span class="badge-status badge-optimal">ACTIVE</span></div>
+          <div class="hazard-snippet">Solar particle event (SPE) telemetry & GCR shielding.</div>
+        </div>
+        <div class="hazard-card">
+          <div class="hazard-card-top"><span class="hazard-name">I // Isolation & Confinement</span><span class="badge-status badge-optimal">NOMINAL</span></div>
+          <div class="hazard-snippet">Behavioral health, circadian lighting, crew cohesion.</div>
+        </div>
+        <div class="hazard-card">
+          <div class="hazard-card-top"><span class="hazard-name">D // Distance from Earth</span><span class="badge-status badge-optimal">NOMINAL</span></div>
+          <div class="hazard-snippet">Autonomous medical autonomy & supply buffering.</div>
+        </div>
+        <div class="hazard-card">
+          <div class="hazard-card-top"><span class="hazard-name">G // Gravity Fields</span><span class="badge-status badge-optimal">NOMINAL</span></div>
+          <div class="hazard-snippet">Microgravity, bone density, & vestibular adaptation.</div>
+        </div>
+        <div class="hazard-card">
+          <div class="hazard-card-top"><span class="hazard-name">E // Hostile/Closed Environments</span><span class="badge-status badge-optimal">NOMINAL</span></div>
+          <div class="hazard-snippet">Cabin CO2, air quality, microbiome, & water
