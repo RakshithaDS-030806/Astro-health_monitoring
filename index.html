@@ -1,219 +1,175 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ARES-IV Astronaut Self-Health Monitor</title>
+<title>ARES-IV Astronaut Health Monitor</title>
 <style>
 :root{--bg:#050a14;--card:#0a1322;--bd:#1b2a40;--tx:#e2e8f0;--mut:#7c8da5;--cy:#22d3ee;--ok:#10b981;--wa:#f59e0b;--cr:#f43f5e;--m:ui-monospace,Menlo,Consolas,monospace}
 *{box-sizing:border-box;margin:0}
 body{background:var(--bg);color:var(--tx);font:13px/1.45 system-ui,sans-serif;padding:12px;max-width:1100px;margin:auto}
 .card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:14px}
-.row{display:flex;align-items:center}.sp{justify-content:space-between}.wrap{flex-wrap:wrap}.g{gap:8px}
-.m{font-family:var(--m)}.sm{font-size:10px;color:var(--mut);font-family:var(--m)}
-.cy{color:var(--cy)}.am{color:var(--wa)}.ttl{font:700 15px var(--m);letter-spacing:1px}
+.row{display:flex;align-items:center}.sp{justify-content:space-between}.wrap{flex-wrap:wrap}.g{gap:8px}.mt{margin-top:10px}
+.sm{font:10px var(--m);color:var(--mut)}.cy{color:var(--cy)}.am{color:var(--wa)}.ttl{font:700 15px var(--m);letter-spacing:1px}
+h3{font:11px var(--m);color:var(--cy);margin-bottom:4px}
 button{background:#0b1730;color:var(--tx);border:1px solid var(--bd);border-radius:8px;padding:6px 10px;font:11px var(--m);cursor:pointer}
-button.on{background:#0e3a4a;border-color:var(--cy);color:#67e8f9}
-button.red{background:#3a1220;border-color:#7f1d3a;color:#fda4af}
+button.on{background:#0e3a4a;border-color:var(--cy);color:#67e8f9}button.red{background:#3a1220;border-color:#7f1d3a;color:#fda4af}
 .rd{border:1px solid var(--bd);padding:5px 10px;border-radius:8px;font:10px var(--m);color:var(--mut)}.rd b{color:var(--ok);font-size:13px}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-@media(min-width:800px){.grid2.h{grid-template-columns:repeat(3,1fr)}.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}}
-.hz{border:1px solid var(--bd);border-radius:12px;padding:12px;cursor:pointer;background:#08101e}
-.hz.on{background:#241a08}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(min-width:800px){.grid.h{grid-template-columns:repeat(3,1fr)}.hzs{grid-template-columns:repeat(2,1fr)!important}}
+.hzs{display:grid;grid-template-columns:1fr;gap:10px}
+.hz{display:flex;align-items:center;gap:12px;border:1px solid var(--bd);border-left:4px solid var(--c);border-radius:12px;padding:12px;background:#08101e;cursor:pointer}
+.hz.on{background:#0e1a30;border-color:var(--c)}
+.ic{width:42px;height:42px;border-radius:50%;background:var(--c);display:grid;place-items:center;font-size:20px;flex:none;opacity:.9}
+.hb{flex:1}.ar{width:28px;height:28px;border-radius:50%;background:#f43f3f;display:grid;place-items:center;font-weight:700;flex:none}
 .tag{font:9px var(--m);padding:2px 6px;border-radius:4px;border:1px solid}
 .ok{color:var(--ok);border-color:#0b5c43;background:#0a2a22}.wa{color:var(--wa);border-color:#6b4a0a;background:#2a2008}.cr{color:var(--cr);border-color:#7f1d3a;background:#2a0d18}
-.met{border:1px solid var(--bd);border-radius:12px;padding:10px;cursor:pointer;background:#08101e}
-.met.on{border-color:var(--cy)}
-.met .v{font:700 22px var(--m);margin:6px 0 2px}.met .v small{font-size:10px;color:var(--mut);font-weight:400}
-h3{font:11px var(--m);color:var(--cy);letter-spacing:.5px;margin-bottom:4px}
+.met{border:1px solid var(--bd);border-radius:12px;padding:10px;cursor:pointer;background:#08101e}.met.on{border-color:var(--cy)}
+.met .v{font:700 22px var(--m);margin:6px 0 2px}.met small{font-size:10px;color:var(--mut);font-weight:400}
+.box{border:1px solid var(--bd);border-radius:10px;padding:10px;margin-top:8px;background:#08101e}
 .q{display:flex;justify-content:space-between;align-items:center;gap:8px;border:1px solid var(--bd);border-radius:10px;padding:10px;margin-top:8px;cursor:pointer;background:#08101e}
 .q.d span:first-child{text-decoration:line-through;opacity:.6}
-input[type=number]{width:100%;background:#050a14;border:1px solid var(--bd);border-radius:6px;color:var(--tx);padding:7px;font:13px var(--m)}
-.f{border:1px solid var(--bd);border-radius:8px;padding:8px;background:#08101e}
-.f label{display:block;font:9px var(--m);color:var(--mut);margin-bottom:4px}
-.big{width:100%;padding:10px;margin-top:10px;background:linear-gradient(90deg,#0891b2,#2563eb);border:0;color:#fff;font-weight:700}
-.exam{border:1px solid var(--bd);border-radius:10px;padding:12px;margin-top:10px;background:#050a14}
 .esc{border:1px solid #6b4a0a;background:#2a2008;color:#fcd34d;border-radius:8px;padding:8px;margin-top:8px}
-.alert{border:1px solid #7f1d3a;background:#2a0d18;color:#fda4af}
+input[type=number]{width:100%;background:#050a14;border:1px solid var(--bd);border-radius:6px;color:var(--tx);padding:7px;font:13px var(--m)}
+label{display:block;font:9px var(--m);color:var(--mut);margin-bottom:4px}
+.big{width:100%;padding:10px;margin-top:10px;background:linear-gradient(90deg,#0891b2,#2563eb);border:0;color:#fff;font-weight:700}
+.alert{border-color:#7f1d3a;background:#2a0d18;color:#fda4af}.warn{border-color:#6b4a0a;background:#2a2008;color:#fcd34d}
 svg{width:100%;height:auto;display:block}
 </style></head><body>
 
 <header class="card">
- <div class="row sp"><div><div class="ttl">ARES-IV | ASTRONAUT SELF-HEALTH MONITOR</div>
- <div class="sm"><span class="cy">EARTH DELAY: <b id="dl"></b> MIN</span> | <span class="am" id="xps"></span></div></div>
- <div class="rd">READINESS <b id="rd"></b></div></div>
- <div class="row wrap g" style="margin-top:10px">
-  <span id="crew" class="row g"></span>
-  <span class="row g m" style="font-size:11px">DAY <b id="dn"></b>/180
-   <input type="range" id="sl" min="1" max="180" value="48">
-   <button id="nx">▷ +1D</button><button id="an" class="red">✦ Simulate Anomaly</button></span>
- </div>
- <div class="row wrap g" style="margin-top:10px"><span class="sm">MISSION ENVIRONMENT:</span><span id="envs" class="row wrap g"></span></div>
- <div class="sm cy" id="envd" style="margin-top:6px"></div>
+ <div class="row sp"><div><div class="ttl">ARES-IV | ASTRONAUT HEALTH MONITOR</div>
+  <div class="sm"><span class="cy">EARTH DELAY: <b id="dl"></b> MIN</span> | <span class="am" id="xp"></span></div></div>
+  <div class="rd">READINESS <b id="rd"></b></div></div>
+ <div class="row wrap g mt"><span id="crew" class="row g"></span>
+  <span class="row g sm" style="color:var(--tx)">DAY <b id="dn"></b>/180 <input type="range" id="sl" min="1" max="180">
+  <button data-a="next">▷ +1D</button><button class="red" data-a="anom">✦ Simulate Anomaly</button><button data-a="reset">↺ Reset</button></span></div>
+ <div class="row wrap g mt"><span class="sm">MISSION ENVIRONMENT:</span><span id="envs" class="row wrap g"></span></div>
+ <div class="sm cy mt" id="envd"></div>
 </header>
-
-<div id="banner" class="card row sp wrap g" style="border-color:#0e4a5c"></div>
-
-<section class="card"><h3>✦ NASA FIVE HAZARDS OF HUMAN SPACEFLIGHT (RIDGE) — INTERACTIVE RISK MATRIX</h3>
-<div class="sm" style="margin-bottom:10px">Select any spaceflight hazard to inspect systems, telemetry and countermeasures.</div>
-<div id="hazards" class="grid2 h"></div></section>
-
+<div id="ban" class="card"></div>
+<section class="card"><h3>NASA FIVE HAZARDS OF HUMAN SPACEFLIGHT — INTERACTIVE RISK MATRIX</h3>
+ <div class="sm" style="margin-bottom:10px">Select a hazard to inspect affected systems, trends and countermeasures.</div><div id="hz" class="hzs"></div></section>
 <div id="brief" class="card"></div>
-
-<section class="card"><h3>CORE ASTRONAUT HEALTH INDICATORS (CLICK ANY METRIC TO INSPECT TREND)</h3>
-<div class="sm" style="margin-bottom:10px">COLOR KEY: <span style="color:var(--ok)">GREEN = OPTIMAL</span> • <span style="color:var(--wa)">AMBER = CAUTION</span> • <span style="color:var(--cr)">RED = CRITICAL</span></div>
-<div id="metrics" class="grid2 h"></div></section>
-
-<section class="card"><h3>👁 CLICKABLE ANATOMICAL &amp; HABITAT MAP</h3>
-<div class="sm" style="margin-bottom:8px">Click any organ system for step-by-step space exam instructions and escalation rules.</div>
-<div class="grid2" style="margin-bottom:10px"><button id="vb" onclick="setView('body')">👤 CREW ANATOMY</button><button id="vh" onclick="setView('habitat')">▦ CLOSED ECOSYSTEM</button></div>
-<div id="map" style="max-width:320px;margin:auto"></div><div id="exam"></div></section>
-
+<section class="card"><h3>CORE HEALTH INDICATORS (TAP A METRIC FOR ITS TREND)</h3>
+ <div class="sm" style="margin-bottom:10px">GREEN = OPTIMAL • AMBER = CAUTION • RED = CRITICAL</div><div id="met" class="grid h"></div></section>
+<section class="card"><h3>CLICKABLE ANATOMICAL &amp; HABITAT MAP</h3>
+ <div class="grid" style="margin:8px 0"><button id="vb" data-a="view" data-v="body">👤 CREW ANATOMY</button><button id="vh" data-a="view" data-v="habitat">▦ CLOSED ECOSYSTEM</button></div>
+ <div id="map" style="margin:auto"></div><div id="exam"></div></section>
 <section class="card" id="quests"></section>
-
-<section class="card"><div class="row sp wrap g"><div><h3>↗ LONGITUDINAL TELEMETRY CURVE</h3><div class="sm" id="ctl"></div></div><div id="tabs" class="row wrap g"></div></div>
-<div id="chart" style="margin-top:10px"></div>
-<div class="row sp sm" style="margin-top:6px"><span>■ Optimal Band &nbsp;■ Caution Zone</span><span>30-DAY LONGITUDINAL WINDOW</span></div></section>
-
-<section class="card"><h3>⚙ MULTI-MODAL TELEMETRY &amp; SELF-ASSESSMENT HUB</h3>
-<div class="sm" style="margin-bottom:8px">Input health indicators via keyboard, quick check-in, or simulated scan.</div>
-<div class="row g" id="htabs" style="margin-bottom:10px"></div>
-<div id="hub" class="grid2 h"></div>
-<button class="big" onclick="save()">📋 UPDATE BIOMETRICS &amp; EVALUATE THRESHOLDS (+40 XP)</button></section>
-
+<section class="card"><div class="row sp wrap g"><div><h3>LONGITUDINAL TELEMETRY CURVE</h3><div class="sm" id="ctl"></div></div><div id="tabs" class="row wrap g"></div></div>
+ <div id="chart" class="mt"></div><div class="row sp sm mt"><span>■ Optimal &nbsp;■ Caution</span><span>30-DAY WINDOW</span></div></section>
+<section class="card"><h3>MULTI-MODAL TELEMETRY &amp; SELF-ASSESSMENT HUB</h3>
+ <div class="row g mt" id="htabs"></div><div id="hub" class="grid h mt"></div>
+ <button class="big" data-a="save">📋 UPDATE BIOMETRICS &amp; EVALUATE THRESHOLDS (+40 XP)</button></section>
 <section class="card"><div class="row sp"><h3>AUTONOMOUS CARE &amp; COUNTERMEASURE LOG</h3><span class="sm" id="lc"></span></div>
-<div class="sm" id="lsub"></div><div id="log"></div></section>
+ <div class="sm" id="lsub"></div><div id="log"></div></section>
 
 <script>
-const $=id=>document.getElementById(id);
-const CREW={vance:{n:'Cmdr. Elena Vance',ini:'EV',bt:'O-',hr:58,sys:114,dia:72,rs:1,bl:.0044,b0:.24},
- chen:{n:'Dr. Marcus Chen',ini:'MC',bt:'A+',hr:64,sys:118,dia:76,rs:1.08,bl:.0051,b0:.12}};
-const ENV=[['Spacecraft (0g)','0.00g Microgravity • High GCR flux, cephalad fluid shift','0.00'],
- ['Space Station (LEO)','0.00g Microgravity • Magnetosphere partly shields radiation','0.00'],
- ['Lunar Base (0.16g)','0.16g Lunar gravity • Regolith dust, surface radiation','0.16'],
- ['Mars Surface (0.38g)','0.38g Martian gravity • Thin atmosphere, perchlorate dust','0.38']];
-const MET={
- glucose:{l:'Blood Sugar',u:'mg/dL',tg:'METABOLIC',tab:'GLUCOSE',min:55,max:165,o:[70,115],w:[60,140],ic:'💧'},
- bp:{l:'Blood Pressure',u:'mmHg',tg:'4. GRAVITY',tab:'BP',min:80,max:160,o:[100,125],w:[90,140],ic:'📈'},
- hr:{l:'Heart Rate',u:'BPM',tg:'4. GRAVITY',tab:'HR',min:45,max:110,o:[50,75],w:[45,90],ic:'♡'},
- temp:{l:'Body Temp',u:'°C',tg:'5. CLOSED ENV',tab:'TEMP',min:35,max:39,o:[36.1,37.2],w:[35.5,38],ic:'🌡'},
- sleep:{l:'Daily Sleep',u:'hrs',tg:'2. ISOLATION',tab:'SLEEP',min:3.5,max:9.5,o:[6.8,9.5],w:[5.5,9.5],ic:'☾'},
- nutrition:{l:'Nutrition & Fluid',u:'%',tg:'NUTRITION',tab:'NUTRITION',min:50,max:100,o:[85,100],w:[70,100],ic:'🍎'},
- radiation:{l:'Radiation Dose',u:'mSv',tg:'1. RADIATION',tab:'RADIATION',min:0,max:300,o:[0,140],w:[0,220],ic:'🛡'},
- bone:{l:'Bone Density',u:'T-score',tg:'4. GRAVITY',tab:'BONE',min:-2.2,max:1,o:[-.8,1],w:[-1.5,1],ic:'🦴'}};
-const H={
- radiation:{c:'R',n:'Space Radiation',t:'GCR & Solar Particle Event (SPE) Dosimetry',ic:'☢',col:'#f59e0b',m:'radiation',nd:'immune',
-  d:'Invisible to the human eye, space radiation is not only stealthy but considered one of the most hazardous aspects of spaceflight—causing DNA damage, oxidative stress, and long-term degenerative risk.',
-  q:[['r1','Deploy High-Density Water-Wall Storm Shelter Baffles','Shielding',40],['r2','Administer Radioprotective Antioxidant & Micronutrient Pack','Cellular',30],['r3','Sync Personal Active Dosimeter & Lymphocyte Micro-Assay','Telemetry',25]]},
- isolation:{c:'I',n:'Isolation and Confinement',t:'Behavioral Health, Morale & Circadian Sync',ic:'🧠',col:'#a78bfa',m:'sleep',nd:'neuro',
-  d:'Behavioral responses occur among groups far from Earth who are isolated and confined in a small space for a long time, affecting sleep, mood, and cognitive cohesion.',
-  q:[['i1','Run 30m Blue-Enriched Circadian Entrainment Lighting','Circadian',30],['i2','Complete Private Cognitive-Behavioral & Prosody Check-In','Behavioral',35],['i3','Engage Earth-Nature Sensory Decompression Session','Morale',25]]},
- distance:{c:'D',n:'Distance from Earth',t:'Comms Latency, Self-Diagnostics & Supply Autonomy',ic:'📡',col:'#22d3ee',m:'glucose',nd:'metabolic',
-  d:'Instructions, supplies and medical care become harder to receive from Earth as astronauts travel deeper into space, requiring autonomous self-diagnosis and onboard triage.',
-  q:[['d1','Run Local Autonomous Clinical Decision Tree & Ultrasound Self-Scan','Self-Care',35],['d2','Audit Closed-Loop Pharmacy & IV Consumable Reserves','Logistics',25],['d3','Compress & Queue Burst Telemetry to Houston','Comms',20]]},
- gravity:{c:'G',n:'Gravity Fields',t:'Microgravity, Moon (0.16g) & Mars (0.38g) Adaptation',ic:'🧭',col:'#34d399',m:'bone',nd:'musculo',
-  d:"Astronauts' muscles, bones, inner ear and organs must adjust to new gravity levels on the spacecraft, the Moon, Mars, and Earth upon return.",
-  q:[['g1','Execute 60m ARED Heavy Resistive Squat/Deadlift Loading','Bone/Muscle',50],['g2','Perform Gaze-Stabilization & Vestibular Drills','Inner Ear',30],['g3','Complete LBNP Vascular Gradient & Electrolyte Protocol','Fluid Shift',30]]},
- environment:{c:'E',n:'Hostile/Closed Environments',t:'Cabin Atmosphere, Acoustics, Microbes & Immunity',ic:'☣',col:'#fb7185',m:'temp',nd:'immune',
+/* ---------- CONFIG (all data in one place) ---------- */
+const CREW={vance:{n:'Cmdr. Elena Vance',hr:58,sys:114,dia:72,rs:1,bl:.0044,b0:.24},chen:{n:'Dr. Marcus Chen',hr:64,sys:118,dia:76,rs:1.08,bl:.0051,b0:.12}};
+const ENV=[['Spacecraft (0g)','0.00g Microgravity • High GCR flux, cephalad fluid shift'],['Space Station (LEO)','0.00g Microgravity • Magnetosphere partly shields radiation'],
+ ['Lunar Base (0.16g)','0.16g Lunar gravity • Regolith dust, surface radiation'],['Mars Surface (0.38g)','0.38g Martian gravity • Thin atmosphere, perchlorate dust']];
+// ok = optimal range, w = caution range (outside w = critical)
+const M={glucose:{l:'Blood Sugar',u:'mg/dL',tg:'METABOLIC',tab:'GLUCOSE',min:55,max:165,ok:[70,115],w:[65,140],ic:'💧'},
+ bp:{l:'Blood Pressure',u:'mmHg',tg:'GRAVITY',tab:'BP',min:80,max:160,ok:[100,125],w:[90,139],ic:'📈'},
+ hr:{l:'Heart Rate',u:'BPM',tg:'GRAVITY',tab:'HR',min:45,max:110,ok:[50,75],w:[45,90],ic:'♡'},
+ temp:{l:'Body Temp',u:'°C',tg:'CLOSED ENV',tab:'TEMP',min:35,max:39,ok:[36.1,37.2],w:[35.5,37.9],ic:'🌡'},
+ sleep:{l:'Daily Sleep',u:'hrs',tg:'ISOLATION',tab:'SLEEP',min:3.5,max:9.5,ok:[6.8,9.5],w:[5.5,9.5],ic:'☾'},
+ nutrition:{l:'Nutrition & Fluid',u:'%',tg:'NUTRITION',tab:'NUTRITION',min:50,max:100,ok:[85,100],w:[70,100],ic:'🍎'},
+ radiation:{l:'Radiation Dose',u:'mSv',tg:'RADIATION',tab:'RADIATION',min:0,max:300,ok:[0,140],w:[0,220],ic:'🛡'},
+ bone:{l:'Bone Density',u:'T-score',tg:'GRAVITY',tab:'BONE',min:-2.2,max:1,ok:[-.8,1],w:[-1.5,1],ic:'🦴'}};
+const H=[
+ {id:'radiation',n:'Space Radiation',t:'GCR & Solar Particle Event (SPE) Dosimetry',ic:'☢',col:'#b45309',ms:['radiation'],met:'radiation',node:'immune',
+  d:'Invisible to the human eye, space radiation is not only stealthy but considered one of the most hazardous aspects of spaceflight — causing DNA damage, oxidative stress and long-term degenerative risk.',
+  q:[['r1','Deploy High-Density Water-Wall Storm Shelter Baffles','Shielding',40],['r2','Administer Radioprotective Antioxidant & Micronutrient Pack','Cellular',30],['r3','Sync Personal Dosimeter & Lymphocyte Micro-Assay','Telemetry',25]]},
+ {id:'isolation',n:'Isolation and Confinement',t:'Behavioral Health, Morale & Circadian Sync',ic:'🧠',col:'#7c3aed',ms:['sleep'],met:'sleep',node:'neuro',
+  d:'Behavioral responses occur among groups of people far from Earth who are isolated and confined in a small space over a long period of time.',
+  q:[['i1','Run 30m Blue-Enriched Circadian Lighting','Circadian',30],['i2','Complete Private Cognitive-Behavioral Check-In','Behavioral',35],['i3','Engage Earth-Nature Sensory Decompression Session','Morale',25]]},
+ {id:'distance',n:'Distance from Earth',t:'Comms Latency, Self-Diagnostics & Supply Autonomy',ic:'🌍',col:'#0e7490',ms:['glucose','nutrition'],met:'glucose',node:'metabolic',
+  d:'Instructions, new supplies and medical care become increasingly challenging to receive from Earth as astronauts venture deeper into space, requiring autonomous self-diagnosis.',
+  q:[['d1','Run Autonomous Clinical Decision Tree & Ultrasound Self-Scan','Self-Care',35],['d2','Audit Closed-Loop Pharmacy & IV Reserves','Logistics',25],['d3','Compress & Queue Burst Telemetry to Houston','Comms',20]]},
+ {id:'gravity',n:'Gravity Fields',t:'Microgravity, Moon (0.16g) & Mars (0.38g) Adaptation',ic:'🧭',col:'#047857',ms:['bp','hr','bone'],met:'bone',node:'musculo',
+  d:"Astronauts' entire bodies — muscles, bones, inner ear and organs — must adjust to the new gravities on the station or spacecraft, the Moon, Mars, and Earth on return.",
+  q:[['g1','Execute 60m ARED Heavy Resistive Loading','Bone/Muscle',50],['g2','Perform Gaze-Stabilization & Vestibular Drills','Inner Ear',30],['g3','Complete LBNP Vascular & Electrolyte Protocol','Fluid Shift',30]]},
+ {id:'environment',n:'Hostile/Closed Environments',t:'Cabin Atmosphere, Acoustics, Microbes & Immunity',ic:'☣',col:'#be123c',ms:['temp'],met:'temp',node:'immune',
   d:'Maintaining a safe ecosystem inside a spacecraft means managing temperature, pressure, lighting, noise, microbial communities and immune responses.',
-  q:[['e1','Verify ECLSS CO2 Scrubber & HEPA Air Filtration','Atmosphere',30],['e2','Sequence Surface Biofilm Swab & Water Loop Microbiome','Microbial',30],['e3','Engage Acoustic Fan Dampening & Sleep-Bay Ear Protection','Acoustics',20]]}};
+  q:[['e1','Verify ECLSS CO2 Scrubber & HEPA Filtration','Atmosphere',30],['e2','Sequence Surface Biofilm & Water Microbiome Swab','Microbial',30],['e3','Engage Acoustic Fan Dampening & Sleep-Bay Ear Protection','Acoustics',20]]}];
+const HB=Object.fromEntries(H.map(h=>[h.id,h]));
 const NODES={
- vestibular:{n:'INNER EAR / VESTIB',x:132,y:52,h:'gravity',m:'bone',t:'Vestibular & Inner Ear',
-  how:'Do a gaze-stabilization drill: fix on a target, turn the head side to side for 30 s. Note dizziness or nausea.',
-  why:'Without gravity the otolith organs lose reference signals, causing disorientation and space motion sickness.',
-  esc:'Alert CMO if vertigo persists > 24 h, vomiting occurs, or balance score < 6/10.'},
+ vestibular:{n:'INNER EAR / VESTIB',x:132,y:52,h:'gravity',m:'bone',t:'Inner Ear & Vestibular System',
+  how:'Do a gaze-stabilization drill: fix on a target and turn your head side to side for 30 s. Note dizziness or nausea.',why:'Without gravity the otolith organs lose their reference signals, causing disorientation and space motion sickness.',esc:'Alert CMO if vertigo lasts > 24 h, vomiting occurs, or balance score is < 6/10.'},
  neuro:{n:'BRAIN / EYES / MOOD',x:168,y:48,h:'isolation',m:'sleep',t:'Brain, Sleep & Mood',
-  how:'Rate mood and sleep quality, log hours slept, and do a 2-minute reaction-time and vision check.',
-  why:'Confinement and 90-minute light/dark cycles disrupt melatonin, REM sleep and team cohesion.',
-  esc:'Alert CMO if sleep < 5.5 h for 3 nights, persistent low mood, or blurred vision.'},
- cardio:{n:'CARDIO / FLUIDS',x:162,y:138,h:'gravity',m:'hr',t:'Cardio & Fluid Shift',
-  how:'Measure resting HR and BP seated after 5 minutes of rest. Check for facial puffiness.',
-  why:'About 2 L of fluid shifts toward the head, lowering plasma volume by 10–15%.',
-  esc:'Alert CMO if resting HR > 90 or < 45 bpm, or BP > 140/90 mmHg.'},
+  how:'Rate mood and sleep quality, log hours slept, and do a 2-minute reaction-time and vision check.',why:'Confinement and 90-minute light/dark cycles disrupt melatonin, REM sleep and team cohesion.',esc:'Alert CMO if sleep < 5.5 h for 3 nights, persistent low mood, or blurred vision.'},
+ cardio:{n:'CARDIO / FLUIDS',x:162,y:138,h:'gravity',m:'hr',t:'Cardiovascular & Fluid Shift',
+  how:'Measure resting HR and BP seated after 5 minutes of rest. Check for facial puffiness.',why:'About 2 L of fluid shifts toward the head, lowering plasma volume by 10–15%.',esc:'Alert CMO if resting HR is > 90 or < 45 bpm, or BP is > 140/90 mmHg.'},
  metabolic:{n:'METABOLIC / GLUCOSE',x:150,y:170,h:'distance',m:'glucose',t:'Metabolic, Blood Sugar & Nutrition',
-  how:'Scan your continuous glucose patch (or do a sterile fingerstick) before breakfast and 2 h post-meal, plus tympanic body temperature.',
-  why:'Spaceflight alters insulin sensitivity, suppresses thirst and reduces appetite, risking dehydration, glycemic spikes or subclinical fever.',
-  esc:'Adjust macros and fluids if glucose is 115–140 mg/dL or hydration < 2.0 L. Alert CMO if fasting glucose > 140 or < 65 mg/dL, or body temp ≥ 38.0 °C.'},
- immune:{n:'IMMUNE / RADIATION',x:134,y:190,h:'radiation',m:'radiation',t:'Immune & Radiation Risk',
-  how:'Sync your personal dosimeter, check skin for rashes and note any cold-sore or viral reactivation.',
-  why:'GCR and solar particle events cause DNA damage and dysregulate T-cell immunity.',
-  esc:'Shelter in the storm shelter above 140 mSv cumulative. Alert CMO for fever or new infection.'},
+  how:'Scan your continuous glucose patch (or do a sterile fingerstick) before breakfast and 2 h post-meal, and take a tympanic temperature.',why:'Spaceflight alters insulin sensitivity, suppresses thirst and reduces appetite, risking dehydration, glycemic spikes or subclinical fever.',esc:'Adjust macros and fluids if glucose is 115–140 mg/dL or hydration < 2.0 L. Alert CMO if fasting glucose > 140 or < 65 mg/dL, or temp ≥ 38.0 °C.'},
+ immune:{n:'IMMUNE / RADIATION',x:134,y:190,h:'radiation',m:'radiation',t:'Immune System & Radiation Risk',
+  how:'Sync your personal dosimeter, check skin for rashes and note any viral reactivation such as cold sores.',why:'GCR and solar particle events cause DNA damage and dysregulate T-cell immunity.',esc:'Move to the storm shelter above 140 mSv cumulative. Alert CMO for fever or new infection.'},
  musculo:{n:'BONES / MUSCLES',x:174,y:295,h:'gravity',m:'bone',t:'Bones & Muscles',
-  how:'Complete 60 minutes of ARED resistive loading. Note back pain or weakness.',
-  why:'Unloading causes 1–1.5% monthly bone loss and rapid postural muscle atrophy.',
-  esc:'Alert CMO if bone T-score < -1.5 or you feel sudden bone pain.'}};
+  how:'Complete 60 minutes of ARED resistive loading. Note back pain or weakness.',why:'Unloading causes 1–1.5% monthly bone loss and rapid postural muscle atrophy.',esc:'Alert CMO if bone T-score < -1.5 or you feel sudden bone pain.'}};
+const SCEN=[['radiation','SOLAR PARTICLE EVENT (SPE) SPIKE','Proton flux rising. Deploy storm shelter baffles.'],['isolation','CONFINEMENT & CIRCADIAN DESYNC','REM sleep deficit and isolation stress detected.'],
+ ['distance','COMMS LATENCY SURGE','Solar conjunction raising Earth delay and glucose drift.'],['gravity','GRAVITY TRANSITION STRAIN','Orthostatic HR spike and vestibular drift. Run LBNP & ARED drills.'],
+ ['environment','CABIN MICROBIAL & ACOUSTIC SPIKE','Cabin noise 70 dBA and microbial rise. Verify HEPA filtration.']];
+const LBL=['OPTIMAL','CAUTION','CRITICAL'],CLS=['ok','wa','cr'],HEX=['#10b981','#f59e0b','#f43f5e'];
 
-let S={crew:'vance',day:48,hz:'radiation',met:'glucose',node:'metabolic',view:'body',env:0,xp:1420,streak:18,
- done:{g1:1,e1:1},anoms:[],over:{},hub:0,
- logs:[{d:48,t:'GRAVITY',x:'Completed 60m ARED resistive loading & gaze-stabilization vestibular check (+50 XP).'},
-       {d:47,t:'METABOLIC',x:'Logged fasting Blood Sugar (94 mg/dL), Body Temp (36.9°C), and 2.6 L hydration intake.'}]};
+/* ---------- STATE (persisted in localStorage) ---------- */
+const KEY='ares4-v1',$=x=>document.getElementById(x);
+const DEF=()=>({crew:'vance',day:48,hz:'radiation',met:'glucose',node:'metabolic',env:0,view:'body',hub:0,xp:1420,streak:18,done:{g1:1,e1:1},anoms:[],ov:{},
+ logs:[{d:48,t:'GRAVITY',x:'Completed 60m ARED resistive loading & gaze-stabilization vestibular check (+50 XP).'},{d:47,t:'METABOLIC',x:'Logged fasting Blood Sugar (94 mg/dL), Body Temp (36.9°C) and 2.6 L hydration.'}]});
+let S;try{S={...DEF(),...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch{S=DEF()}
 
+/* ---------- TELEMETRY (generated once, memoised) ---------- */
 const nz=s=>{const x=Math.sin(s*12.9898+78.233)*43758.5453;return x-Math.floor(x)-.5};
-function gen(){const C=CREW[S.crew],o=S.crew=='vance'?0:40;let rad=4.5,bone=C.b0,out=[];
- for(let d=1;d<=180;d++){const n1=nz(d*3+o+1),n2=nz(d*7+o+2),n3=nz(d*11+o+3);
-  const a=h=>S.anoms.some(x=>x.h==h&&d>=x.day&&d<=x.day+4);
+let memo={k:'',d:[]};
+function series(){const k=S.crew+JSON.stringify(S.anoms);if(memo.k==k)return memo.d;
+ const C=CREW[S.crew],o=S.crew=='vance'?0:40;let rad=4.5,bone=C.b0;const out=[];
+ for(let d=1;d<=180;d++){const a=h=>S.anoms.some(x=>x.h==h&&d>=x.day&&d<=x.day+4),n1=nz(d*3+o+1),n2=nz(d*7+o+2),n3=nz(d*11+o+3);
   rad=+(rad+(.84+n1*.14)*C.rs+(a('radiation')?19.5:0)).toFixed(1);
   bone=+(bone-C.bl*(Math.sin(d*.25)>.3?.55:1)+n2*.008-(a('gravity')?.06:0)).toFixed(2);
-  out.push({day:d,glucose:Math.round(91+n1*10+(a('distance')?38:0)),
-   sys:Math.round(C.sys+d/180*6+n2*5+(a('gravity')?15:0)),dia:Math.round(C.dia+d/180*3+n3*4+(a('gravity')?9:0)),
-   hr:Math.round(C.hr+d/180*6+n1*5+(a('gravity')?17:0)),
-   temp:+(36.9+n2*.4+(a('environment')?1.4:0)).toFixed(1),
+  out.push({day:d,glucose:Math.round(91+n1*10+(a('distance')?38:0)),sys:Math.round(C.sys+d/180*6+n2*5+(a('gravity')?15:0)),dia:Math.round(C.dia+d/180*3+n3*4+(a('gravity')?9:0)),
+   hr:Math.round(C.hr+d/180*6+n1*5+(a('gravity')?17:0)),temp:+(36.9+n2*.4+(a('environment')?1.4:0)).toFixed(1),
    sleep:+Math.max(4.2,Math.min(8.6,7.4+n3*.8-(a('isolation')?1.9:0))).toFixed(1),
    nutrition:Math.round(Math.max(52,Math.min(100,100-(a('environment')?18:0)-(a('distance')?10:0)+n3*2))),
-   kcal:Math.round(2600+n1*120),fluid:+(2.5+n2*.4).toFixed(1),radiation:rad,bone,
-   immune:Math.round(91+n2*4-(a('radiation')?12:0)),vest:Math.round(93+n1*4-(a('gravity')?22:0)),
-   mood:Math.max(2,Math.round(8+n3*2-(a('isolation')?3:0))),delay:+(.8+d*.2+(a('distance')?8.5:0)).toFixed(1)});}
- return out}
-
-let R=[];
+   kcal:Math.round(2600+n1*120),fluid:+(2.5+n2*.4).toFixed(1),radiation:rad,bone,immune:Math.round(91+n2*4-(a('radiation')?12:0)),
+   vest:Math.round(93+n1*4-(a('gravity')?22:0)),mood:Math.max(2,Math.round(8+n3*2-(a('isolation')?3:0))),delay:+(.8+d*.2+(a('distance')?8.5:0)).toFixed(1)})}
+ memo={k,d:out};return out}
+const rowAt=d=>({...series()[d-1],...S.ov[S.crew+d]}),cur=()=>rowAt(S.day);
 const val=(k,r)=>k=='bp'?r.sys:r[k];
-const st=(k,v)=>{const m=MET[k];return v>=m.o[0]&&v<=m.o[1]?'ok':v>=m.w[0]&&v<=m.w[1]?'wa':'cr'};
-const rank={ok:0,wa:1,cr:2},worst=(...a)=>a.reduce((x,y)=>rank[y]>rank[x]?y:x,'ok');
-const LBL={ok:'OPTIMAL',wa:'CAUTION',cr:'CRITICAL'},HEX={ok:'#10b981',wa:'#f59e0b',cr:'#f43f5e'};
-const cur=()=>R[S.day-1];
-function hs(c){const r=cur(),s=k=>st(k,val(k,r));
- return {radiation:s('radiation'),isolation:s('sleep'),distance:worst(s('glucose'),s('nutrition')),gravity:worst(s('bp'),s('hr'),s('bone')),environment:s('temp')}[c]}
-function nodeSt(id){const r=cur();
- return id=='vestibular'?(r.vest>=82?'ok':r.vest>=68?'wa':'cr'):id=='neuro'?st('sleep',r.sleep):id=='cardio'?st('hr',r.hr):
- id=='metabolic'?st('glucose',r.glucose):id=='immune'?st('radiation',r.radiation):st('bone',r.bone)}
-const fmt=(k,r)=>k=='bp'?r.sys+'/'+r.dia:k=='nutrition'?r.nutrition:val(k,r);
-function sub(k,r){return {glucose:'Fasting Target: 70-115',bp:'Fluid Shift: '+ENV[S.env][0].split(' (')[0],hr:'Baseline: '+CREW[S.crew].hr+' bpm',
- temp:(r.temp*9/5+32).toFixed(1)+'°F Core',sleep:'Mood Score: '+r.mood+'/10',nutrition:r.kcal+' kcal • '+r.fluid+'L',
- radiation:'Immune Idx: '+r.immune+'%',bone:'Vestibular: '+r.vest+'%'}[k]}
-function readiness(){let s=96;Object.keys(H).forEach(h=>{const x=hs(h);if(x=='wa')s-=6;if(x=='cr')s-=14});
- s+=Math.min(8,Object.keys(S.done).filter(k=>S.done[k]).length*2);return Math.max(24,Math.min(100,Math.round(s)))}
-function log(t,x){S.logs.unshift({d:S.day,t,x});S.logs=S.logs.slice(0,8)}
+const st=(k,v)=>{const m=M[k];return v>=m.ok[0]&&v<=m.ok[1]?0:v>=m.w[0]&&v<=m.w[1]?1:2};
+const hl=(h,r)=>Math.max(...h.ms.map(k=>st(k,val(k,r))));
+const nst=(n,id,r)=>id=='vestibular'?(r.vest>=82?0:r.vest>=68?1:2):st(n.m,val(n.m,r));
+const fmt=(k,r)=>k=='bp'?r.sys+'/'+r.dia:val(k,r);
+const sub=(k,r)=>({glucose:'Fasting Target: 70-115',bp:'Fluid Shift: '+ENV[S.env][0].split(' (')[0],hr:'Baseline: '+CREW[S.crew].hr+' bpm',temp:(r.temp*9/5+32).toFixed(1)+'°F Core',
+ sleep:'Mood Score: '+r.mood+'/10',nutrition:r.kcal+' kcal • '+r.fluid+' L',radiation:'Immune Idx: '+r.immune+'%',bone:'Vestibular: '+r.vest+'%'})[k];
+function readiness(r){let s=96;H.forEach(h=>{const l=hl(h,r);s-=l==1?6:l==2?14:0});s+=Math.min(8,Object.values(S.done).filter(Boolean).length*2);return Math.max(24,Math.min(100,s))}
+const log=(t,x)=>{S.logs=[{d:S.day,t,x},...S.logs].slice(0,8)};
 
-function render(){
- R=gen().map((r,i)=>({...r,...(S.over[S.crew+(i+1)]||{})}));
- const r=cur(),C=CREW[S.crew],lvl=1+Math.floor(S.xp/500);
- $('dl').textContent=r.delay;$('xps').textContent=`⚡ ${S.streak}D STREAK • ${S.xp} XP`;
- $('rd').textContent=readiness()+'%';$('dn').textContent=S.day;$('sl').value=S.day;
- $('crew').innerHTML=Object.keys(CREW).map(k=>`<button class="${S.crew==k?'on':''}" onclick="setCrew('${k}')">👤 ${CREW[k].n}</button>`).join('');
- $('envs').innerHTML=ENV.map((e,i)=>`<button class="${S.env==i?'on':''}" onclick="S.env=${i};render()">${e[0]}</button>`).join('');
- $('envd').textContent=ENV[S.env][1];
- const act=S.anoms.filter(a=>S.day>=a.day&&S.day<=a.day+4).pop();
- $('banner').className='card row sp wrap g'+(act?' alert':'');
- $('banner').innerHTML=act?`<span class="m">⚠ ${act.title} — ${act.desc}</span>`:
-  `<span class="m" style="font-size:11px">🔔 14:00 UTC Routine: Log fasting Blood Sugar (mg/dL) &amp; complete 60m ARED resistive squat protocol.</span><span class="tag am" style="border-color:#6b4a0a">Lvl ${lvl} • Deep-Space Specialist</span>`;
- $('hazards').innerHTML=Object.keys(H).map(k=>{const h=H[k],s=hs(k),on=S.hz==k;
-  return `<div class="hz" style="${on?'border-color:'+h.col:''}" onclick="pickHz('${k}')"><div class="row sp"><span class="m"><b>${h.c}</b> <span style="color:${h.col}">${h.ic}</span></span><span class="tag ${s}">${LBL[s]}</span></div>
-  <div style="font-weight:600;margin-top:8px">${h.n}</div><div class="sm" style="margin:2px 0 8px">${h.t}</div>
-  <div class="sm" style="${on?'color:'+h.col:''}">${on?'ACTIVE FOCUS':'SELECT HAZARD'} ›</div></div>`}).join('');
- const hz=H[S.hz];
- $('brief').innerHTML=`<div class="m" style="font-size:11px;color:var(--cy);margin-bottom:6px">HAZARD BRIEF // ${hz.n.toUpperCase()} <span class="tag ${hs(S.hz)}">${LBL[hs(S.hz)]}</span></div>${hz.d}`;
- $('metrics').innerHTML=Object.keys(MET).map(k=>{const m=MET[k],s=st(k,val(k,r));
-  return `<div class="met ${S.met==k?'on':''}" onclick="pickMet('${k}')" style="${s!='ok'?'border-color:'+HEX[s]:''}"><div class="row sp"><span class="tag ${s}">${m.tg}</span><span>${m.ic}</span></div>
-  <div class="sm" style="margin-top:8px;color:var(--tx)">${m.l}</div><div class="v">${fmt(k,r)} <small>${m.u}</small></div>
-  <div class="row sp"><span class="sm">${sub(k,r)}</span><span style="color:${HEX[s]}">●</span></div></div>`}).join('');
+/* ---------- RENDERERS ---------- */
+function render(){const r=cur(),h=HB[S.hz],lvl=1+Math.floor(S.xp/500);
+ $('dl').textContent=r.delay;$('xp').textContent=`⚡ ${S.streak}D STREAK • ${S.xp} XP • LVL ${lvl}`;$('rd').textContent=readiness(r)+'%';
+ $('dn').textContent=S.day;$('sl').value=S.day;
+ $('crew').innerHTML=Object.keys(CREW).map(k=>`<button class="${S.crew==k?'on':''}" data-a="crew" data-v="${k}">👤 ${CREW[k].n}</button>`).join('');
+ $('envs').innerHTML=ENV.map((e,i)=>`<button class="${S.env==i?'on':''}" data-a="env" data-v="${i}">${e[0]}</button>`).join('');$('envd').textContent=ENV[S.env][1];
+ const bad=Object.keys(M).filter(k=>st(k,val(k,r))>0),crit=bad.filter(k=>st(k,val(k,r))==2);
+ $('ban').className='card '+(crit.length?'alert':bad.length?'warn':'');
+ $('ban').innerHTML=crit.length?`<b class="sm" style="color:inherit">⚠ ESCALATE TO CMO:</b> ${crit.map(k=>`${M[k].l} ${fmt(k,r)} ${M[k].u}`).join(' • ')}`:
+  bad.length?`<b class="sm" style="color:inherit">⚠ CAUTION:</b> ${bad.map(k=>`${M[k].l} ${fmt(k,r)} ${M[k].u}`).join(' • ')}`:
+  `<span class="sm" style="color:var(--tx)">🔔 14:00 UTC Routine: Log fasting Blood Sugar (mg/dL) &amp; complete 60m ARED resistive squat protocol.</span>`;
+ $('hz').innerHTML=H.map(x=>{const l=hl(x,r);return `<div class="hz ${S.hz==x.id?'on':''}" style="--c:${x.col}" data-a="hz" data-v="${x.id}"><span class="ic">${x.ic}</span>
+  <div class="hb"><div class="row sp"><b>${x.n}</b><span class="tag ${CLS[l]}">${LBL[l]}</span></div><div class="sm">${x.t}</div></div><span class="ar">→</span></div>`}).join('');
+ $('brief').innerHTML=`<div class="sm cy" style="margin-bottom:6px">HAZARD BRIEF // ${h.n.toUpperCase()} <span class="tag ${CLS[hl(h,r)]}">${LBL[hl(h,r)]}</span></div>${h.d}`;
+ $('met').innerHTML=Object.keys(M).map(k=>{const m=M[k],s=st(k,val(k,r));
+  return `<div class="met ${S.met==k?'on':''}" style="${s&&S.met!=k?'border-color:'+HEX[s]:''}" data-a="met" data-v="${k}"><div class="row sp"><span class="tag ${CLS[s]}">${m.tg}</span><span>${m.ic}</span></div>
+  <div class="sm mt" style="color:var(--tx)">${m.l}</div><div class="v">${fmt(k,r)} <small>${m.u}</small></div><div class="row sp"><span class="sm">${sub(k,r)}</span><span style="color:${HEX[s]}">●</span></div></div>`}).join('');
  $('vb').className=S.view=='body'?'on':'';$('vh').className=S.view=='habitat'?'on':'';
- drawMap();drawExam();drawQuests();drawChart();drawHub();
+ map(r);exam(r);quests(h);chart();hub(r);
  $('lc').textContent=S.logs.length+' LOGS';$('lsub').textContent=`Queued for asynchronous burst transmission (${r.delay} light-min to Earth).`;
- $('log').innerHTML=S.logs.map(l=>`<div class="exam" style="margin-top:8px"><span class="tag cy" style="color:var(--cy);border-color:#0e4a5c;margin-right:8px">D${l.d} • ${l.t}</span>${l.x}</div>`).join('');
-}
-function drawMap(){
- if(S.view=='habitat'){const r=cur(),ea=S.anoms.some(x=>x.h=='environment'&&S.day>=x.day&&S.day<=x.day+4);
-  const cards=[['Cabin Temp',r.temp+'°C','Target: 20.5–22.5°C'],['Atmosphere',(ea?98.7:101.3)+' kPa','O2: 21.1% • CO2: 0.38%'],
-   ['Acoustic Noise',(ea?70:55)+' dBA','Limit: <60 dBA'],['Microbial Load',(ea?310:Math.round(115+S.day/180*65))+' CFU/m³','Immune Idx: '+r.immune+'%']];
-  $('map').style.maxWidth='none';
-  $('map').innerHTML=`<div class="grid2">${cards.map(c=>`<div class="f"><div class="sm">${c[0]}</div><div class="m" style="font-size:18px;font-weight:700">${c[1]}</div><div class="sm">${c[2]}</div></div>`).join('')}</div>`;return}
- $('map').style.maxWidth='320px';
- const nodes=Object.keys(NODES).map(id=>{const n=NODES[id],s=nodeSt(id),c=HEX[s],sel=S.node==id,right=n.x>=150,lx=right?n.x+32
+ $('log').innerHTML=S.logs.map(l=>`<div class="box"><span class="tag cy" style="border-color:#0e4a5c;margin-right:8px">D${l.d} • ${l.t}</span>${l.x}</div>`).join('');
+ try{localStorage.setItem(KEY,JSON.stringify(S))}catch{}}
+
+function map(r){const el=$('map');
+ if(S.view=='habitat'){const ea=S.anoms.some(x=>x.h=='environment'&&S.day>=x.day&&S.day<=x.day+4);
+  const c=[['Cabin Temp',r.temp+'°C','Target: 20.5–22.5°C'],['Atmosphere',(ea?98.7:101.3)+' kPa','O2 21.1% • CO2 0.38%'],['Acoustic Noise',(ea?70:55)+' dBA','Limit: <60 dBA'],['Microbial Load',(ea?310:Math.round(115+S.day/180*65))+' CFU/m³','Immune Idx: '+r.immune+'%']];
+  el.style.maxWidth='none';el.innerHTML=`<div class="grid">${c.map(a=>`<div class="box"><div class="sm">${a[0]}</div><div style="font:700 18px var(--m)">${a[1]}</div><div class="sm">${a[2]}</div></div>`).join('')}</div>`;return}
+ el.style.maxWidth='320px';
+ const nodes=Object.entries(NODES).map(([id,n])=>{const c=HEX[nst(n,id,r)],se
